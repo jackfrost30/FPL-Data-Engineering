@@ -59,8 +59,8 @@ This project automates the process of fetching, cleaning, and analyzing Fantasy 
    ```bash
    docker-compose up
 
-   This command will build the Docker containers and start the application. If this is the first time you're running it, Docker may need to pull the required images, which could take a few minutes. Once the containers are 
-   up, the application will be available and running locally, and you can access it through the designated ports specified in the docker-compose.yml.
+   This command will build the Docker containers and start the application. If this is the first time you're running it, Docker may need to pull the required images, which could take a few minutes. Once the containers 
+   are up, the application will be available and running locally, and you can access it through the designated ports specified in the docker-compose.yml.
    To run the containers in detached mode (background), use the following command:
 
    ```bash
