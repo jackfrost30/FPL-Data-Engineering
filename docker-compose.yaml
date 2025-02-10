@@ -1,0 +1,77 @@
+services:
+  webserver:
+    image: apache/airflow:2.6.0-python3.9
+    command: webserver
+    entrypoint: ["/opt/airflow/script/entrypoint.sh"]
+    #    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "3"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./script/entrypoint.sh:/opt/airflow/script/entrypoint.sh
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/opt/airflow/data
+      - ./app:/opt/airflow/app
+    #      - ./airflow.cfg:/opt/airflow/airflow.cfg
+    #      - ./airflow.db:/opt/airflow/airflow.db
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://webserver:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - confluent
+
+  postgres:
+    image: postgres:14.0
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "3"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - confluent
+
+  scheduler:
+    image: apache/airflow:2.6.0-python3.9
+    #    restart: always
+    depends_on:
+      webserver:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/opt/airflow/data
+      - ./app:/opt/airflow/app
+    env_file:
+      - .env
+    command: bash -c "pip install --no-cache-dir -r ./requirements.txt && airflow db upgrade && airflow scheduler"
+    networks:
+      - confluent
+networks:
+  confluent:
+volumes:
+  postgres_data: {}
