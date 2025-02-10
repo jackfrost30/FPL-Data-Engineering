@@ -63,12 +63,10 @@ This project automates the process of fetching, cleaning, and analyzing Fantasy 
    are up, the application will be available and running locally, and you can access it through the designated ports specified in the docker-compose.yml.
    To run the containers in detached mode (background), use the following command:
 
-   ```bash
    docker-compose up -d
 
    To shut down the containers when you're done:
 
-   ```bash
    docker-compose down
 
 
